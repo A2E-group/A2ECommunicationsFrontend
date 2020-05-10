@@ -1,4 +1,4 @@
-import React, { useState }from 'react';
+import React, { Component }from 'react';
 import Avatar from '@material-ui/core/Avatar';
 import Button from '@material-ui/core/Button';
 import CssBaseline from '@material-ui/core/CssBaseline';
@@ -7,80 +7,78 @@ import Link from '@material-ui/core/Link';
 import Grid from '@material-ui/core/Grid';
 import Box from '@material-ui/core/Box';
 import Typography from '@material-ui/core/Typography';
-import { makeStyles } from '@material-ui/core/styles';
 import Container from '@material-ui/core/Container';
 import Valdation from '../../validations'
-import {useHistory} from "react-router-dom";
+import { connect } from 'react-redux';
+import { postSignUp } from "../../actions/SessionActions";
 import './signup.css'
-function Copyright() {
-    return (
-        <Typography variant="body2" color="textSecondary" align="center">
-            {'Copyright © '}
-            <Link color="inherit" href="https://www.linkedin.com/in/bala-krishna-uruturu-48269a117/">
-                Developed by Balakrishna U
-      </Link>{' '}
-            {new Date().getFullYear()}
-            {'.'}
-        </Typography>
-    );
-}
-const useStyles = makeStyles((theme) => ({
-    paper: {
-        marginTop: theme.spacing(8),
-        display: 'flex',
-        flexDirection: 'column',
-        alignItems: 'center',
-    },
-    avatar: {
-        margin: theme.spacing(1),
-        backgroundColor: theme.palette.secondary.main,
-    },
-    form: {
-        width: '100%', // Fix IE 11 issue.
-        marginTop: theme.spacing(3),
-    },
-    submit: {
-        margin: theme.spacing(3, 0, 2),
-    },
-}));
-export default function SignUp() {
-    const classes = useStyles();
-    const history = useHistory();
-    const [firstName, setFirstName] = useState('');
-    const [lastName, setLastName] = useState('');
-    const [email, setEmail] = useState('');
-    const [firstNameError, setFirstNameError] = useState(false);
-    const [lastNameError, setLastNameError] = useState(false);
-    const [emailError, setEmailError] = useState(false);
-    // console.log(firstName);
-    const onSumbit = {
-        onSubmitCall(cb){
-            if(!firstName.length){
-                setFirstNameError(true);
-                return false;
-            }else if(!lastName.length){
-                setLastNameError(true);
-                return false;
-            }else if(!Valdation.validateEmail(email)){
-                setEmailError(true);
-                return false;
-            }else{
-                console.log("all values",firstName, lastName, email);
-                cb();
-            }
-        } 
+class SignUp extends Component {
+    constructor(props) {
+      super(props);
+    this.state = {
+        firstName: '',
+        firstNameError: false,
+        lastName:'',
+        lastNameError: false,
+        email:'',
+        emailError:false,
+        isVerificationSent: props.isVerificationSent,
+        errorMsg:''
     }
+    if(props.isVerificationSent){
+        props.history.push("./emailverifiction")
+    }
+}
+
+componentWillReceiveProps(nextProps){
+    // console.log(nextProps);
+    if(nextProps.isVerificationSent){
+        nextProps.history.push("./emailverifiction")
+    }
+}
+    onSubmitCall = (cb) => {
+        let {firstName, lastName, email} = this.state;
+        if(!firstName.length){
+            this.setState({
+                firstNameError: true
+            })
+            return false;
+        }else if(!lastName.length){
+            this.setState({
+                lastNameError: true
+            })
+            return false;
+        }else if(!Valdation.validateEmail(email)){
+            this.setState({
+                emailError: true
+            })
+            return false;
+        }else if(this.props.isVerificationSent){
+            // console.log("all values",firstName, lastName, email);
+        } else {
+            let user = {isProspect: true, email,firstName: firstName, lastName: lastName}
+            let obj = {user: user}
+            // console.log(obj, "in the component");
+            this.props.postSignUp(obj);
+        }
+    } 
+    onChange = (type, event, value) => {
+        this.setState({
+            [type]: event.target.value
+        })
+        // console.log(type, event, value);
+    }
+    render(){
+    let {firstName, lastName, email, lastNameError, firstNameError, emailError} = this.state;
     return (
         <Container component="main" maxWidth="xs">
             <CssBaseline />
-            <div className={classes.paper}>
-                <Avatar className={classes.avatar}>
-                    {/* <LockOutlinedIcon /> */}
+            <div className="paper">
+                <Avatar className="avatar">
                 </Avatar>
                 <Typography component="h1" variant="h5">
                     Sign up
         </Typography>
-                {/* <form className={classes.form} noValidate > */}
                 <div>
                     <Grid container spacing={2}>
                         <Grid item xs={12} sm={6}>
@@ -94,13 +92,7 @@ export default function SignUp() {
                                 id="firstName"
                                 label="First Name"
                                 autoFocus
-                                onChange = {(e,val)=> {
-                                    console.log('firt name change',e.target.value,val);
-                                    setFirstName(e.target.value);
-                                    if(e.target.value){
-                                        setFirstNameError(false);
-                                    }
-                                }}
+                                onChange = {this.onChange.bind(this,"firstName")}
                             />
                         </Grid>
                         <Grid item xs={12} sm={6}>
@@ -113,12 +105,7 @@ export default function SignUp() {
                                 label="Last Name"
                                 name="lastName"
                                 autoComplete="lname"
-                                onChange = {(e,val)=> {
-                                    setLastName(e.target.value,val);
-                                    if(e.target.value){
-                                        setLastNameError(false);
-                                    }
-                                }}
+                                onChange = {this.onChange.bind(this,"lastName")}
                                 
                             />
                         </Grid>
@@ -126,19 +113,13 @@ export default function SignUp() {
                             <TextField
                                 variant="outlined"
                                 required
-                                value={email}
                                 fullWidth
                                 id="email"
                                 error={emailError}
                                 label="Email Address"
                                 name="email"
                                 autoComplete="email"
-                                onChange = {(e,val)=> {
-                                    setEmail(e.target.value,val);
-                                    if(e.target.value){
-                                        setEmailError(false);
-                                    }
-                                }}
+                                onChange = {this.onChange.bind(this,"email")}
                             />
                         </Grid>
                     </Grid>
@@ -147,11 +128,8 @@ export default function SignUp() {
                         fullWidth
                         variant="contained"
                         color="primary"
-                        className={classes.submit}
-                        onClick={() => {
-                            onSumbit.onSubmitCall(()=> { history.push('/emailverifiction')})
-                            }
-                        }
+                        className="submit"
+                        onClick={this.onSubmitCall}
                     >
                         Sign Up
           </Button>
@@ -168,5 +146,28 @@ export default function SignUp() {
                 <Copyright />
             </Box>
         </Container>
+    );
+}
+
+}
+const mapStateToProps = state => ({
+    isVerificationSent: state.session.isVerificationSent || false,
+    data: state.session.list
+});
+export default connect(mapStateToProps, {
+    postSignUp
+  })(SignUp);
+
+
+  function Copyright() {
+    return (
+        <Typography variant="body2" color="textSecondary" align="center">
+            {'Copyright © '}
+            <Link color="inherit" href="https://www.linkedin.com/in/bala-krishna-uruturu-48269a117/">
+                Developed by A2E
+      </Link>{' '}
+            {new Date().getFullYear()}
+            {'.'}
+        </Typography>
     );
 }

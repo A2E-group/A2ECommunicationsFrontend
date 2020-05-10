@@ -1,0 +1,8 @@
+
+export const SNACKBAR_CLOSE = "SNACKBAR_CLOSE"
+export const LOGIN_SUCCESS = 'LOGIN_SUCCESS';
+export const LOGOUT = 'LOGOUT';
+export const SIGNUP_SUCCESS = "SIGNUP_SUCESS";
+export const SIGNUP_POST = "SIGNUP_POST"; 
+export const VERIFY_SUCCESS = "VERIFY_SUCCESS";
+export const OPEN_SANCKBAR = "OPEN_SNACKBAR";

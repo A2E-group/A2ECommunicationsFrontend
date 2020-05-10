@@ -28,20 +28,20 @@ export default function Routes() {
                 {/* A <Switch> looks through its children <Route>s and
             renders the first one that matches the current URL. */}
                 <Switch>
-                    <Route path="/home">
-                        <TestHome/>
+                    <Route path="/home" component={TestHome}>
+                        {/* <TestHome/> */}
                     </Route>
-                    <Route path="/firstpassword">
-                        <FirstPassword/>
+                    <Route path="/firstpassword" component={FirstPassword}>
+                        {/* <FirstPassword/> */}
                     </Route>
-                    <Route path="/emailverifiction">
-                        <EmailVerification/>
+                    <Route path="/emailverifiction" component={EmailVerification}>
+                        {/* <EmailVerification/> */}
                     </Route>
-                    <Route path="/signup">
-                        <SignUp/>
+                    <Route path="/signup"  component={SignUp}> 
+                        {/* <SignUp/> */}
                     </Route>
-                    <Route path="/">
-                        < SignIn/>
+                    <Route path="/" component={SignIn}>
+                        {/* < SignIn/> */}
                     </Route>
                 </Switch>
             </div>

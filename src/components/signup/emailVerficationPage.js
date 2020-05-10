@@ -6,6 +6,10 @@ import Grid from '@material-ui/core/Grid';
 import { makeStyles } from '@material-ui/core/styles';
 import Container from '@material-ui/core/Container';
 import {useHistory} from "react-router-dom";
+// import {CustomizedSnackbars} from "../snackbarcomponent/customSnackbar";
+import { emailVerfication } from "../../actions/SessionActions"; 
+import { connect } from 'react-redux';
+// import { connect } from 'react-redux';
 const useStyles = makeStyles((theme) => ({
     paper: {
         marginTop: theme.spacing(8),
@@ -25,14 +29,32 @@ const useStyles = makeStyles((theme) => ({
         margin: theme.spacing(3, 0, 2),
     },
 }));
-export default function EmailVerificationPage() {
+function EmailVerificationPage(props) {
+    if(props.isVerified){
+        props.history.push("./firstpassword");
+    }
     const classes = useStyles();
     let history = useHistory();
     const [verificationCode, setVerificationCode] = useState('');
     const onSumbit = {
+        // {
+        //     "callerInfo": {
+        //            "appName": "Collaboration",
+        //            "appKey" : "12345"// use these temporary values till we implement proper authorization technique.
+        //          },
+        //     "user"{
+        //       "email":<String>,
+        //       "secret":{
+        //         "otp" : <String>
+        //       }
+        //     }
+        //   }
+          
             onSubmitCall(cb){
-                console.log("all values",verificationCode);
-                cb();
+                // console.log("all values",verificationCode);
+                // cb();
+                let obj = {user: {"email": props.postEmail, "secret":{"otp": verificationCode }}}
+                props.emailVerfication(obj);
             } 
         }
     return (
@@ -52,7 +74,7 @@ export default function EmailVerificationPage() {
                                 label="Enter verification code"
                                 autoFocus
                                 onChange = {(e,val)=> {
-                                    console.log('firt name change',e.target.value,val);
+                                    // console.log('firt name change',e.target.value,val);
                                     setVerificationCode(e.target.value);
                                 }}
                             />
@@ -65,6 +87,7 @@ export default function EmailVerificationPage() {
                         color="primary"
                         className={classes.submit}
                         onClick={() => {
+                            // this.props.onClickVerification();
                             onSumbit.onSubmitCall(()=> { history.push('/firstpassword')})
                             }
                         }
@@ -75,3 +98,9 @@ export default function EmailVerificationPage() {
         </Container>
     );
 }
+const mapStateToProps = state => ({
+    postEmail: state.session.postEmail
+});
+export default connect(mapStateToProps, {
+    emailVerfication
+  })(EmailVerificationPage);
